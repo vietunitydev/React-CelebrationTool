@@ -58,7 +58,7 @@ const FallingHeartsWebsite: React.FC = () => {
 
         if (rand < 0.73) {
             type = 'text';
-        } else if (rand < 0.85) {
+        } else if (rand < 0.86) {
             type = 'heart';
         } else {
             type = 'image';
@@ -83,7 +83,7 @@ const FallingHeartsWebsite: React.FC = () => {
             speed: 2 + Math.random() * 3, // Tốc độ nhanh hơn: 2-5px/frame
             rotation: 0,
             rotationSpeed: type === 'heart' ? (Math.random() - 0.5) * 4 : 0, // Chỉ tim mới xoay
-            size: type === 'image' ? 1.2 + Math.random() * 0.8 : 1 // Ảnh có size từ 1.2 đến 2.0 (to hơn)
+            size: type === 'image' ? 0.9 + Math.random() * 0.8 : 1 // Ảnh có size từ 1.2 đến 2.0 (to hơn)
         };
     };
 
