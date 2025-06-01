@@ -9,6 +9,7 @@ import LessonList from './pages/LessonList';
 import WordList from './pages/WordList';
 import GameView from './pages/GameView';
 import GameResults from './pages/GameResults';
+import Emiu from './pages/Emiu.tsx';
 
 // Protected route component
 const ProtectedRoute: React.FC<{ element: React.ReactElement }> = ({ element }) => {
@@ -26,64 +27,67 @@ const App: React.FC = () => {
         <AuthProvider>
             <Router>
                 <Routes>
-                    <Route path="/login" element={<Login />} />
+                    <Route path="/" element={<Emiu />} />
 
-                    <Route
-                        path="/"
-                        element={
-                            <Layout>
-                                <ProtectedRoute element={<Home />} />
-                            </Layout>
-                        }
-                    />
 
-                    <Route
-                        path="/vocab-test"
-                        element={
-                            <Layout>
-                                <ProtectedRoute element={<ProjectList />} />
-                            </Layout>
-                        }
-                    />
+                    {/*<Route path="/login" element={<Login />} />*/}
 
-                    <Route
-                        path="/vocab-test/project/:projectId"
-                        element={
-                            <Layout>
-                                <ProtectedRoute element={<LessonList />} />
-                            </Layout>
-                        }
-                    />
+                    {/*<Route*/}
+                    {/*    path="/"*/}
+                    {/*    element={*/}
+                    {/*        <Layout>*/}
+                    {/*            <ProtectedRoute element={<Home />} />*/}
+                    {/*        </Layout>*/}
+                    {/*    }*/}
+                    {/*/>*/}
 
-                    <Route
-                        path="/vocab-test/project/:projectId/lesson/:lessonId"
-                        element={
-                            <Layout>
-                                <ProtectedRoute element={<WordList />} />
-                            </Layout>
-                        }
-                    />
+                    {/*<Route*/}
+                    {/*    path="/vocab-test"*/}
+                    {/*    element={*/}
+                    {/*        <Layout>*/}
+                    {/*            <ProtectedRoute element={<ProjectList />} />*/}
+                    {/*        </Layout>*/}
+                    {/*    }*/}
+                    {/*/>*/}
 
-                    <Route
-                        path="/vocab-test/project/:projectId/lesson/:lessonId/game"
-                        element={
-                            <Layout>
-                                <ProtectedRoute element={<GameView />} />
-                            </Layout>
-                        }
-                    />
+                    {/*<Route*/}
+                    {/*    path="/vocab-test/project/:projectId"*/}
+                    {/*    element={*/}
+                    {/*        <Layout>*/}
+                    {/*            <ProtectedRoute element={<LessonList />} />*/}
+                    {/*        </Layout>*/}
+                    {/*    }*/}
+                    {/*/>*/}
 
-                    <Route
-                        path="/vocab-test/project/:projectId/lesson/:lessonId/results"
-                        element={
-                            <Layout>
-                                <ProtectedRoute element={<GameResults />} />
-                            </Layout>
-                        }
-                    />
+                    {/*<Route*/}
+                    {/*    path="/vocab-test/project/:projectId/lesson/:lessonId"*/}
+                    {/*    element={*/}
+                    {/*        <Layout>*/}
+                    {/*            <ProtectedRoute element={<WordList />} />*/}
+                    {/*        </Layout>*/}
+                    {/*    }*/}
+                    {/*/>*/}
 
-                    {/* Fallback route */}
-                    <Route path="*" element={<Navigate to="/" replace />} />
+                    {/*<Route*/}
+                    {/*    path="/vocab-test/project/:projectId/lesson/:lessonId/game"*/}
+                    {/*    element={*/}
+                    {/*        <Layout>*/}
+                    {/*            <ProtectedRoute element={<GameView />} />*/}
+                    {/*        </Layout>*/}
+                    {/*    }*/}
+                    {/*/>*/}
+
+                    {/*<Route*/}
+                    {/*    path="/vocab-test/project/:projectId/lesson/:lessonId/results"*/}
+                    {/*    element={*/}
+                    {/*        <Layout>*/}
+                    {/*            <ProtectedRoute element={<GameResults />} />*/}
+                    {/*        </Layout>*/}
+                    {/*    }*/}
+                    {/*/>*/}
+
+                    {/*/!* Fallback route *!/*/}
+                    {/*<Route path="*" element={<Navigate to="/" replace />} />*/}
                 </Routes>
             </Router>
         </AuthProvider>
