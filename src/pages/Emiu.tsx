@@ -14,6 +14,7 @@ interface FallingItem {
 
 const FallingHeartsWebsite: React.FC = () => {
     const [fallingItems, setFallingItems] = useState<FallingItem[]>([]);
+    const [audioPlaying, setAudioPlaying] = useState(false);
 
     // Các câu tình cảm như trong ảnh
     const loveMessages = [
@@ -38,6 +39,17 @@ const FallingHeartsWebsite: React.FC = () => {
         "5.jpg",
 
     ];
+
+    const handleStartAudio = () => {
+        const audio = document.getElementById('backgroundAudio') as HTMLAudioElement;
+        if (audio) {
+            audio.play().then(() => {
+                setAudioPlaying(true);
+            }).catch(err => {
+                console.log('Audio play failed:', err);
+            });
+        }
+    };
 
     const createFallingItem = (): FallingItem => {
         // Tỷ lệ: chữ rất nhiều, ít tim và ảnh
@@ -105,9 +117,22 @@ const FallingHeartsWebsite: React.FC = () => {
     return (
         <div className="min-h-screen bg-black overflow-hidden relative">
             {/* Background audio */}
-            <audio autoPlay loop className="hidden">
-                <source src="https://www.soundjay.com/misc/sounds/bell-ringing-05.wav" type="audio/wav" />
+            <audio id="backgroundAudio" loop className="hidden">
+                <source src="/eyes.mp3" type="audio/mpeg" />
+                {/*<source src="/audio/love-song.wav" type="audio/wav" />*/}
             </audio>
+
+            {/* Audio control button */}
+            {!audioPlaying && (
+                <div className="fixed top-4 right-4 z-50">
+                    <button
+                        onClick={handleStartAudio}
+                        className="bg-pink-500/80 hover:bg-pink-500 text-white px-4 py-2 rounded-full shadow-lg backdrop-blur-sm border border-pink-300/50 transition-all duration-300 flex items-center gap-2"
+                    >
+                        🎵 Bật nhạc
+                    </button>
+                </div>
+            )}
 
             {/* Falling items */}
             <div className="absolute inset-0 pointer-events-none">
