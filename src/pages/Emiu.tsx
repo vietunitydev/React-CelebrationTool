@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 interface FallingItem {
     id: number;
@@ -10,11 +10,17 @@ interface FallingItem {
     rotation: number;
     rotationSpeed: number;
     size: number;
+    // Thêm properties cho smooth animation
+    lastFrameTime: number;
+    targetY: number;
 }
 
 const FallingHeartsWebsite: React.FC = () => {
     const [fallingItems, setFallingItems] = useState<FallingItem[]>([]);
     const [audioPlaying, setAudioPlaying] = useState(false);
+    const animationFrameRef = useRef<number>();
+    const lastTimeRef = useRef<number>(0);
+    const itemsRef = useRef<FallingItem[]>([]);
 
     // Các câu tình cảm như trong ảnh
     const loveMessages = [
@@ -37,7 +43,6 @@ const FallingHeartsWebsite: React.FC = () => {
         "3.JPG",
         "6.PNG",
         "5.jpg",
-
     ];
 
     const handleStartAudio = () => {
@@ -74,43 +79,68 @@ const FallingHeartsWebsite: React.FC = () => {
             content = images[Math.floor(Math.random() * images.length)];
         }
 
+        const currentTime = performance.now();
         return {
             id: Date.now() + Math.random(),
             type,
             content,
             x: Math.random() * (window.innerWidth - 200),
             y: -150,
+            targetY: -150,
             speed: 2 + Math.random() * 3, // Tốc độ nhanh hơn: 2-5px/frame
             rotation: 0,
             rotationSpeed: type === 'heart' ? (Math.random() - 0.5) * 4 : 0, // Chỉ tim mới xoay
-            size: type === 'image' ? 0.9 + Math.random() * 0.8 : 1 // Ảnh có size từ 1.2 đến 2.0 (to hơn)
+            size: type === 'image' ? 0.9 + Math.random() * 0.8 : 1, // Ảnh có size từ 1.2 đến 2.0 (to hơn)
+            lastFrameTime: currentTime
         };
     };
 
+    // Smooth animation với requestAnimationFrame
+    const animate = (currentTime: number) => {
+        const deltaTime = currentTime - lastTimeRef.current;
+        const normalizedDelta = deltaTime / 16.67; // Normalize to 60fps
+
+        itemsRef.current = itemsRef.current
+            .map(item => {
+                // Smooth interpolation
+                const timeDiff = currentTime - item.lastFrameTime;
+                const smoothFactor = Math.min(timeDiff / 16.67, 1); // Limit to prevent big jumps
+
+                // Update target position
+                item.targetY += item.speed * normalizedDelta;
+
+                // Smooth interpolation towards target
+                const newY = item.y + (item.targetY - item.y) * smoothFactor * 0.8;
+
+                return {
+                    ...item,
+                    y: newY,
+                    rotation: item.rotation + (item.rotationSpeed * normalizedDelta),
+                    lastFrameTime: currentTime
+                };
+            })
+            .filter(item => item.y < window.innerHeight + 200);
+
+        setFallingItems([...itemsRef.current]);
+        lastTimeRef.current = currentTime;
+        animationFrameRef.current = requestAnimationFrame(animate);
+    };
+
     useEffect(() => {
-        // Tạo items rơi nhanh hơn
-        const interval = setInterval(() => {
-            setFallingItems(prev => [...prev, createFallingItem()]);
-        }, 250); // Giảm từ 800ms xuống 400ms
+        // Tạo items rơi
+        const createItemInterval = setInterval(() => {
+            const newItem = createFallingItem();
+            itemsRef.current = [...itemsRef.current, newItem];
+        }, 250);
 
-        // Animation loop với tốc độ cao hơn
-        const animate = () => {
-            setFallingItems(prev =>
-                prev
-                    .map(item => ({
-                        ...item,
-                        y: item.y + item.speed,
-                        rotation: item.rotation + item.rotationSpeed
-                    }))
-                    .filter(item => item.y < window.innerHeight + 200)
-            );
-        };
-
-        const animationFrame = setInterval(animate, 12); // Giảm từ 16ms xuống 12ms
+        // Bắt đầu animation loop với requestAnimationFrame
+        animationFrameRef.current = requestAnimationFrame(animate);
 
         return () => {
-            clearInterval(interval);
-            clearInterval(animationFrame);
+            clearInterval(createItemInterval);
+            if (animationFrameRef.current) {
+                cancelAnimationFrame(animationFrameRef.current);
+            }
         };
     }, []);
 
@@ -134,22 +164,29 @@ const FallingHeartsWebsite: React.FC = () => {
                 </div>
             )}
 
-            {/* Falling items */}
+            {/* Falling items với smooth transitions */}
             <div className="absolute inset-0 pointer-events-none">
                 {fallingItems.map(item => (
                     <div
                         key={item.id}
-                        className="absolute transition-none"
+                        className="absolute"
                         style={{
                             left: `${item.x}px`,
-                            top: `${item.y}px`,
-                            transform: item.type === 'heart' ? `rotate(${item.rotation}deg)` : 'none'
+                            transform: `translateY(${item.y}px) ${item.type === 'heart' ? `rotate(${item.rotation}deg)` : ''}`,
+                            transition: 'transform 0.016s linear', // Smooth micro-transitions
+                            willChange: 'transform' // Optimize for animations
                         }}
                     >
                         {item.type === 'heart' && (
-                            <span className="text-2xl md:text-3xl inline-block" style={{ color: 'rgba(255, 105, 180, 0.8)' }}>
-                {item.content}
-              </span>
+                            <span
+                                className="text-2xl md:text-3xl inline-block"
+                                style={{
+                                    color: 'rgba(255, 105, 180, 0.8)',
+                                    filter: 'drop-shadow(0 0 8px rgba(255, 105, 180, 0.6))'
+                                }}
+                            >
+                                {item.content}
+                            </span>
                         )}
                         {item.type === 'text' && (
                             <div
