@@ -246,7 +246,7 @@ const FallingHeartsWebsite: React.FC = () => {
 
             {/* Date stamp như trong ảnh gốc */}
             <div className="absolute bottom-4 left-4 text-xs" style={{ color: 'rgba(255, 105, 180, 0.4)' }}>
-                5/08/2024
+                02/02/2025
             </div>
 
             {/* Các đốm sáng nhỏ giống như trong ảnh */}
