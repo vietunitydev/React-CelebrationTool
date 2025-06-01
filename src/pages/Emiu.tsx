@@ -56,9 +56,9 @@ const FallingHeartsWebsite: React.FC = () => {
         const rand = Math.random();
         let type: 'heart' | 'text' | 'image';
 
-        if (rand < 0.73) {
+        if (rand < 0.85) {
             type = 'text';
-        } else if (rand < 0.82) {
+        } else if (rand < 0.94) {
             type = 'heart';
         } else {
             type = 'image';
@@ -83,7 +83,7 @@ const FallingHeartsWebsite: React.FC = () => {
             speed: 2 + Math.random() * 3, // Tốc độ nhanh hơn: 2-5px/frame
             rotation: 0,
             rotationSpeed: type === 'heart' ? (Math.random() - 0.5) * 4 : 0, // Chỉ tim mới xoay
-            size: type === 'image' ? 1.2 + Math.random() * 0.8 : 1 // Ảnh có size từ 1.2 đến 2.0 (to hơn)
+            size: type === 'image' ? 0.6 + Math.random() * 0.6 : 1 // Ảnh có size từ 1.2 đến 2.0 (to hơn)
         };
     };
 
@@ -209,7 +209,7 @@ const FallingHeartsWebsite: React.FC = () => {
 
             {/* Date stamp như trong ảnh gốc */}
             <div className="absolute bottom-4 left-4 text-xs" style={{ color: 'rgba(255, 105, 180, 0.4)' }}>
-                5/08/2024
+                2/2/2025
             </div>
 
             {/* Các đốm sáng nhỏ giống như trong ảnh */}
