@@ -1,16 +1,24 @@
 import React, { useState, useEffect, useRef } from 'react';
-import {FallingItem, ProjectData} from "@/types/types.ts";
+import { useParams } from 'react-router-dom';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '../firebase'; // Assuming firebase config is exported from '../firebase'
+import { FallingItem, ProjectData } from "@/types/types.ts";
 
 const MAX_ITEMS = 50;
 
-const FallingHeartsWebsite: React.FC<{ projectData?: ProjectData }> = ({ projectData }) => {
+const FallingHeartsWebsite: React.FC = () => {
     const [fallingItems, setFallingItems] = useState<FallingItem[]>([]);
     const [audioPlaying, setAudioPlaying] = useState(false);
     const [audioError, setAudioError] = useState<string | null>(null);
+    const [projectData, setProjectData] = useState<ProjectData | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
     const animationFrameRef = useRef<number>();
     const lastTimeRef = useRef<number>(0);
     const itemsRef = useRef<FallingItem[]>([]);
+    const { id } = useParams<{ id: string }>();
 
+    // Default data in case fetching fails or for initial setup
     const loveMessages = projectData?.texts || [
         "You make my heart smile",
         "Love ya! 💖",
@@ -27,6 +35,35 @@ const FallingHeartsWebsite: React.FC<{ projectData?: ProjectData }> = ({ project
         "4.jpeg",
         "5.jpeg",
     ];
+
+    // Fetch project data from Firestore
+    useEffect(() => {
+        const fetchProjectData = async () => {
+            if (!id) {
+                setError('No project ID provided.');
+                setLoading(false);
+                return;
+            }
+
+            try {
+                const docRef = doc(db, 'projects', id);
+                const docSnap = await getDoc(docRef);
+
+                if (docSnap.exists()) {
+                    setProjectData(docSnap.data() as ProjectData);
+                } else {
+                    setError('Project not found.');
+                }
+            } catch (err) {
+                console.error('Error fetching project:', err);
+                setError('Failed to load project data.');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchProjectData();
+    }, [id]);
 
     const handleStartAudio = () => {
         const audio = document.getElementById('backgroundAudio') as HTMLAudioElement;
@@ -97,6 +134,8 @@ const FallingHeartsWebsite: React.FC<{ projectData?: ProjectData }> = ({ project
     };
 
     useEffect(() => {
+        if (loading || error) return;
+
         const createItemInterval = setInterval(() => {
             if (itemsRef.current.length < MAX_ITEMS) {
                 const newItem = createFallingItem();
@@ -112,7 +151,23 @@ const FallingHeartsWebsite: React.FC<{ projectData?: ProjectData }> = ({ project
                 cancelAnimationFrame(animationFrameRef.current);
             }
         };
-    }, []);
+    }, [loading, error]);
+
+    if (loading) {
+        return (
+            <div className="min-h-screen bg-black flex items-center justify-center">
+                <p className="text-white text-lg">Loading...</p>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="min-h-screen bg-black flex items-center justify-center">
+                <p className="text-red-500 text-lg">{error}</p>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-black overflow-hidden relative">
@@ -187,7 +242,6 @@ const FallingHeartsWebsite: React.FC<{ projectData?: ProjectData }> = ({ project
                                         filter: 'brightness(1.1) contrast(1.1) saturate(1.2)',
                                     }}
                                     onError={() => {
-                                        // Remove broken image from falling items
                                         itemsRef.current = itemsRef.current.filter(i => i.id !== item.id);
                                         setFallingItems([...itemsRef.current]);
                                     }}
