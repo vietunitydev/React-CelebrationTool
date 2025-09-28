@@ -1,7 +1,7 @@
 // utils/api.js
 
 // API Base URL - thay đổi theo server của bạn
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:4999/api';
+const API_BASE_URL = 'http://localhost:4999/api';
 
 /**
  * Generic API call function
@@ -137,4 +137,77 @@ const createAuthHeaders = (apiKey, additionalHeaders = {}) => {
         'x-api-key': apiKey,
         ...additionalHeaders,
     };
+};
+
+/**
+ * Helper function to handle API errors
+ * @param {Error} error - Error object
+ * @returns {string} - User-friendly error message
+ */
+const handleApiError = (error) => {
+    if (error.message.includes('Network error')) {
+        return 'Network connection failed. Please check your internet connection.';
+    }
+
+    if (error.message.includes('401')) {
+        return 'Invalid or missing API key. Please check your credentials.';
+    }
+
+    if (error.message.includes('403')) {
+        return 'Access denied. You may not have permission to perform this action.';
+    }
+
+    if (error.message.includes('404')) {
+        return 'Requested resource not found.';
+    }
+
+    if (error.message.includes('500')) {
+        return 'Server error. Please try again later.';
+    }
+
+    return error.message || 'An unexpected error occurred.';
+};
+
+/**
+ * Helper function to check if response is successful
+ * @param {Response} response - Fetch response object
+ * @returns {boolean} - True if response is ok
+ */
+const isResponseOk = (response) => {
+    return response.ok && response.status >= 200 && response.status < 300;
+};
+
+/**
+ * Helper function to get API base URL
+ * @returns {string} - API base URL
+ */
+const getApiBaseUrl = () => {
+    return API_BASE_URL;
+};
+
+/**
+ * Helper function to format API endpoint
+ * @param {string} endpoint - Raw endpoint
+ * @returns {string} - Formatted endpoint
+ */
+const formatEndpoint = (endpoint) => {
+    // Ensure endpoint starts with /
+    if (!endpoint.startsWith('/')) {
+        endpoint = '/' + endpoint;
+    }
+    return endpoint;
+};
+
+// Export all functions
+export {
+    apiCall,
+    get,
+    post,
+    put,
+    del,
+    createAuthHeaders,
+    handleApiError,
+    isResponseOk,
+    getApiBaseUrl,
+    formatEndpoint
 };
