@@ -11,13 +11,13 @@ export const sampleProjects: ProjectData[] = [
             "You light up my world"
         ],
         imageUrls: [
-            "https://picsum.photos/200/300?random=1",
-            "https://picsum.photos/200/300?random=2",
-            "https://picsum.photos/200/300?random=3",
-            "https://picsum.photos/200/300?random=4",
-            "https://picsum.photos/200/300?random=5"
+            "1.jpeg",
+            "2.jpeg",
+            "3.jpeg",
+            "4.jpeg",
+            "5.jpeg",
         ],
-        musicUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+        musicUrl: "eyes.mp3",
         theme: "valentine"
     },
     {
@@ -30,13 +30,13 @@ export const sampleProjects: ProjectData[] = [
             "Forever young at heart"
         ],
         imageUrls: [
-            "https://picsum.photos/200/300?random=6",
-            "https://picsum.photos/200/300?random=7",
-            "https://picsum.photos/200/300?random=8",
-            "https://picsum.photos/200/300?random=9",
-            "https://picsum.photos/200/300?random=10"
+            "1.jpeg",
+            "2.jpeg",
+            "3.jpeg",
+            "4.jpeg",
+            "5.jpeg",
         ],
-        musicUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
+        musicUrl: "eyes.mp3",
         theme: "birthday"
     },
     {
@@ -49,13 +49,13 @@ export const sampleProjects: ProjectData[] = [
             "My heart is yours"
         ],
         imageUrls: [
-            "https://picsum.photos/200/300?random=11",
-            "https://picsum.photos/200/300?random=12",
-            "https://picsum.photos/200/300?random=13",
-            "https://picsum.photos/200/300?random=14",
-            "https://picsum.photos/200/300?random=15"
+            "1.jpeg",
+            "2.jpeg",
+            "3.jpeg",
+            "4.jpeg",
+            "5.jpeg",
         ],
-        musicUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3",
+        musicUrl: "eyes.mp3",
         theme: "valentine"
     },
     {
@@ -68,13 +68,13 @@ export const sampleProjects: ProjectData[] = [
             "Forever my summer love"
         ],
         imageUrls: [
-            "https://picsum.photos/200/300?random=16",
-            "https://picsum.photos/200/300?random=17",
-            "https://picsum.photos/200/300?random=18",
-            "https://picsum.photos/200/300?random=19",
-            "https://picsum.photos/200/300?random=20"
+            "1.jpeg",
+            "2.jpeg",
+            "3.jpeg",
+            "4.jpeg",
+            "5.jpeg",
         ],
-        musicUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3",
+        musicUrl: "eyes.mp3",
         theme: "custom"
     },
     {
@@ -87,13 +87,13 @@ export const sampleProjects: ProjectData[] = [
             "Together in winter"
         ],
         imageUrls: [
-            "https://picsum.photos/200/300?random=21",
-            "https://picsum.photos/200/300?random=22",
-            "https://picsum.photos/200/300?random=23",
-            "https://picsum.photos/200/300?random=24",
-            "https://picsum.photos/200/300?random=25"
+            "1.jpeg",
+            "2.jpeg",
+            "3.jpeg",
+            "4.jpeg",
+            "5.jpeg",
         ],
-        musicUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3",
+        musicUrl: "eyes.mp3",
         theme: "valentine"
     },
     {
@@ -106,13 +106,13 @@ export const sampleProjects: ProjectData[] = [
             "Springtime with you"
         ],
         imageUrls: [
-            "https://picsum.photos/200/300?random=26",
-            "https://picsum.photos/200/300?random=27",
-            "https://picsum.photos/200/300?random=28",
-            "https://picsum.photos/200/300?random=29",
-            "https://picsum.photos/200/300?random=30"
+            "1.jpeg",
+            "2.jpeg",
+            "3.jpeg",
+            "4.jpeg",
+            "5.jpeg",
         ],
-        musicUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3",
+        musicUrl: "eyes.mp3",
         theme: "custom"
     },
     {
@@ -125,13 +125,13 @@ export const sampleProjects: ProjectData[] = [
             "Autumn with you"
         ],
         imageUrls: [
-            "https://picsum.photos/200/300?random=31",
-            "https://picsum.photos/200/300?random=32",
-            "https://picsum.photos/200/300?random=33",
-            "https://picsum.photos/200/300?random=34",
-            "https://picsum.photos/200/300?random=35"
+            "1.jpeg",
+            "2.jpeg",
+            "3.jpeg",
+            "4.jpeg",
+            "5.jpeg",
         ],
-        musicUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-7.mp3",
+        musicUrl: "eyes.mp3",
         theme: "custom"
     },
     {
@@ -144,13 +144,13 @@ export const sampleProjects: ProjectData[] = [
             "My cosmic love"
         ],
         imageUrls: [
-            "https://picsum.photos/200/300?random=36",
-            "https://picsum.photos/200/300?random=37",
-            "https://picsum.photos/200/300?random=38",
-            "https://picsum.photos/200/300?random=39",
-            "https://picsum.photos/200/300?random=40"
+            "1.jpeg",
+            "2.jpeg",
+            "3.jpeg",
+            "4.jpeg",
+            "5.jpeg",
         ],
-        musicUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3",
+        musicUrl: "eyes.mp3",
         theme: "valentine"
     },
     {
@@ -163,13 +163,13 @@ export const sampleProjects: ProjectData[] = [
             "Forever my shore"
         ],
         imageUrls: [
-            "https://picsum.photos/200/300?random=41",
-            "https://picsum.photos/200/300?random=42",
-            "https://picsum.photos/200/300?random=43",
-            "https://picsum.photos/200/300?random=44",
-            "https://picsum.photos/200/300?random=45"
+            "1.jpeg",
+            "2.jpeg",
+            "3.jpeg",
+            "4.jpeg",
+            "5.jpeg",
         ],
-        musicUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-9.mp3",
+        musicUrl: "eyes.mp3",
         theme: "custom"
     },
     {
@@ -182,13 +182,13 @@ export const sampleProjects: ProjectData[] = [
             "Yours eternally"
         ],
         imageUrls: [
-            "https://picsum.photos/200/300?random=46",
-            "https://picsum.photos/200/300?random=47",
-            "https://picsum.photos/200/300?random=48",
-            "https://picsum.photos/200/300?random=49",
-            "https://picsum.photos/200/300?random=50"
+            "1.jpeg",
+            "2.jpeg",
+            "3.jpeg",
+            "4.jpeg",
+            "5.jpeg",
         ],
-        musicUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-10.mp3",
+        musicUrl: "eyes.mp3",
         theme: "valentine"
     }
 ];
