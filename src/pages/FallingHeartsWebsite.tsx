@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {FallingItem, ProjectData} from "@/types/types.ts";
 
-const MAX_ITEMS = 50; // Limit the number of falling items for performance
+const MAX_ITEMS = 50;
 
 const FallingHeartsWebsite: React.FC<{ projectData?: ProjectData }> = ({ projectData }) => {
     const [fallingItems, setFallingItems] = useState<FallingItem[]>([]);
@@ -16,16 +16,16 @@ const FallingHeartsWebsite: React.FC<{ projectData?: ProjectData }> = ({ project
         "Love ya! 💖",
         "Thank you for being my sunshine",
         "Yêu em nhìuuuu ! 💖",
-        "Chúc em 1/6 luôn vui tươi",
+        "Chúc em luôn vui tươi",
         "I love you 💖",
     ];
 
     const images = projectData?.imageUrls || [
-        "1.JPG",
-        "2.JPG",
-        "3.JPG",
-        "6.PNG",
-        "5.jpg",
+        "1.jpeg",
+        "2.jpeg",
+        "3.jpeg",
+        "4.jpeg",
+        "5.jpeg",
     ];
 
     const handleStartAudio = () => {
