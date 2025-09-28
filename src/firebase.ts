@@ -14,6 +14,7 @@ const firebaseConfig = {
     measurementId: "G-PD85SBFNBV"
 };
 
+const adminKey = import.meta.env.VITE_FIREBASE_AdminKey
 
 const app = initializeApp(firebaseConfig);
 
@@ -21,4 +22,4 @@ const db = getFirestore(app);
 const auth = getAuth(app);
 
 // Removed storage export since we're using Cloudinary
-export { app, db, auth };
+export { app, db, auth, adminKey };
