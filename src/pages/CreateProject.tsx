@@ -12,6 +12,7 @@ const CreateProject: React.FC = () => {
     const [images, setImages] = useState<File[]>([]);
     const [music, setMusic] = useState<File | null>(null);
     const [theme, setTheme] = useState('valentine');
+    const [key, setKey] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [uploadProgress, setUploadProgress] = useState<string>('');
     const navigate = useNavigate();
@@ -37,7 +38,6 @@ const CreateProject: React.FC = () => {
     const handleMusicChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
             const file = e.target.files[0];
-            // Kiểm tra kích thước file (ví dụ: tối đa 10MB)
             if (file.size > 10 * 1024 * 1024) {
                 alert('Music file size should be less than 10MB.');
                 return;
@@ -56,7 +56,6 @@ const CreateProject: React.FC = () => {
         setUploadProgress('Preparing preview...');
 
         try {
-            // Tạo URL tạm thời cho preview
             const imageUrls: string[] = images.map(image => URL.createObjectURL(image));
             const musicUrl = music ? URL.createObjectURL(music) : '';
 
@@ -84,9 +83,13 @@ const CreateProject: React.FC = () => {
             return;
         }
 
+        if (!key.trim()) {
+            alert('Please provide a key to save the project.');
+            return;
+        }
+
         setIsLoading(true);
         try {
-            // Upload images to Cloudinary
             setUploadProgress('Uploading images...');
             const imageUrls: string[] = [];
 
@@ -102,7 +105,6 @@ const CreateProject: React.FC = () => {
                 }
             }
 
-            // Upload music to Cloudinary (if exists)
             let musicUrl = '';
             if (music) {
                 setUploadProgress('Uploading music...');
@@ -115,7 +117,6 @@ const CreateProject: React.FC = () => {
                 }
             }
 
-            // Save project data to Firestore
             setUploadProgress('Saving project data...');
             const docRef = await addDoc(collection(db, 'projects'), {
                 title,
@@ -123,6 +124,7 @@ const CreateProject: React.FC = () => {
                 imageUrls,
                 musicUrl,
                 theme,
+                key,
                 createdAt: new Date().toISOString(),
             });
 
@@ -293,6 +295,18 @@ const CreateProject: React.FC = () => {
                     )}
                 </div>
 
+                <div>
+                    <label className="block text-gray-700 mb-1 font-medium">Key (required for saving):</label>
+                    <input
+                        type="text"
+                        placeholder="Enter key"
+                        value={key}
+                        onChange={(e) => setKey(e.target.value)}
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        disabled={isLoading}
+                    />
+                </div>
+
                 <div className="flex space-x-4 pt-4">
                     <button
                         onClick={handlePreview}
@@ -304,7 +318,7 @@ const CreateProject: React.FC = () => {
                     <button
                         onClick={handleSave}
                         className="flex-1 bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium"
-                        disabled={isLoading || !title.trim() || texts.length === 0 || images.length < 5}
+                        disabled={isLoading || !title.trim() || texts.length === 0 || images.length < 5 || !key.trim()}
                     >
                         {isLoading ? 'Saving...' : 'Save Project'}
                     </button>
