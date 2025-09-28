@@ -1,23 +1,24 @@
 import { initializeApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
-import { getStorage } from 'firebase/storage';
 import { getAuth } from 'firebase/auth';
+// Removed Firebase Storage imports since we're using Cloudinary now
 
 // Note: In production, move firebaseConfig to environment variables for security
 const firebaseConfig = {
-    apiKey: "AIzaSyBv0ptJ-mZAJ-GA3ypLrJxCO8jXFj2BYeo",
-    authDomain: "viettool-95b23.firebaseapp.com",
-    projectId: "viettool-95b23",
-    storageBucket: "viettool-95b23.firebasestorage.app",
-    messagingSenderId: "164029685435",
-    appId: "1:164029685435:web:b4c4fa97f94d52cc47539e",
+    apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+    authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+    projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+    storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+    appId: import.meta.env.VITE_FIREBASE_APP_ID,
     measurementId: "G-PD85SBFNBV"
 };
+
 
 const app = initializeApp(firebaseConfig);
 
 const db = getFirestore(app);
-const storage = getStorage(app);
 const auth = getAuth(app);
 
-export { app, db, storage, auth };
+// Removed storage export since we're using Cloudinary
+export { app, db, auth };
