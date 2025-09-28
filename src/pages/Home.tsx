@@ -9,8 +9,11 @@ const Home: React.FC = () => {
                 <Link to="/create-project">
                     <button className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg transition-colors">Create New Project</button>
                 </Link>
-                <Link to="/admin">
-                    <button className="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg transition-colors">Admin Panel</button>
+                <Link to="/template">
+                    <button className="bg-purple-500 hover:bg-purple-600 text-white px-6 py-3 rounded-lg transition-colors">View Templates</button>
+                </Link>
+                <Link to="/buykey">
+                    <button className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-lg transition-colors">Buy Key</button>
                 </Link>
             </div>
         </div>
