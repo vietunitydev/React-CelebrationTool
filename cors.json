@@ -1,0 +1,12 @@
+[
+  {
+    "origin": [
+      "http://localhost:5173",
+      "https://viettool-95b23.web.app",
+      "https://viettool-95b23.firebaseapp.com"
+    ],
+    "method": ["GET", "POST", "PUT", "DELETE"],
+    "responseHeader": ["Content-Type", "x-goog-meta-foo"],
+    "maxAgeSeconds": 3600
+  }
+]

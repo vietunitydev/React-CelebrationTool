@@ -1,96 +1,46 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider, useAuth } from './context/AuthContext';
-import Layout from './components/Layout';
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { auth } from './firebase';
 import Home from './pages/Home';
-import Login from './pages/Login';
-import ProjectList from './pages/ProjectList';
-import LessonList from './pages/LessonList';
-import WordList from './pages/WordList';
-import GameView from './pages/GameView';
-import GameResults from './pages/GameResults';
-import Emiu from './pages/Emiu.tsx';
+import CreateProject from './pages/CreateProject';
+import Preview from './pages/Preview';
+import Admin from './pages/Admin';
+import FallingHeartsWebsite from './pages/FallingHeartsWebsite';
 
-// Protected route component
-const ProtectedRoute: React.FC<{ element: React.ReactElement }> = ({ element }) => {
-    const { user } = useAuth();
+const ProtectedRoute: React.FC<{ children: React.ReactElement }> = ({ children }) => {
+    const [user, loading] = useAuthState(auth);
 
-    if (!user) {
-        return <Navigate to="/login" replace />;
+    if (loading) {
+        return <div>Loading...</div>;
     }
 
-    return element;
+    if (!user) {
+        return <Navigate to="/" replace />;
+    }
+
+    return children;
 };
 
 const App: React.FC = () => {
     return (
-        <AuthProvider>
-            <Router>
-                <Routes>
-                    <Route path="/" element={<Emiu />} />
-
-
-                    {/*<Route path="/login" element={<Login />} />*/}
-
-                    {/*<Route*/}
-                    {/*    path="/"*/}
-                    {/*    element={*/}
-                    {/*        <Layout>*/}
-                    {/*            <ProtectedRoute element={<Home />} />*/}
-                    {/*        </Layout>*/}
-                    {/*    }*/}
-                    {/*/>*/}
-
-                    {/*<Route*/}
-                    {/*    path="/vocab-test"*/}
-                    {/*    element={*/}
-                    {/*        <Layout>*/}
-                    {/*            <ProtectedRoute element={<ProjectList />} />*/}
-                    {/*        </Layout>*/}
-                    {/*    }*/}
-                    {/*/>*/}
-
-                    {/*<Route*/}
-                    {/*    path="/vocab-test/project/:projectId"*/}
-                    {/*    element={*/}
-                    {/*        <Layout>*/}
-                    {/*            <ProtectedRoute element={<LessonList />} />*/}
-                    {/*        </Layout>*/}
-                    {/*    }*/}
-                    {/*/>*/}
-
-                    {/*<Route*/}
-                    {/*    path="/vocab-test/project/:projectId/lesson/:lessonId"*/}
-                    {/*    element={*/}
-                    {/*        <Layout>*/}
-                    {/*            <ProtectedRoute element={<WordList />} />*/}
-                    {/*        </Layout>*/}
-                    {/*    }*/}
-                    {/*/>*/}
-
-                    {/*<Route*/}
-                    {/*    path="/vocab-test/project/:projectId/lesson/:lessonId/game"*/}
-                    {/*    element={*/}
-                    {/*        <Layout>*/}
-                    {/*            <ProtectedRoute element={<GameView />} />*/}
-                    {/*        </Layout>*/}
-                    {/*    }*/}
-                    {/*/>*/}
-
-                    {/*<Route*/}
-                    {/*    path="/vocab-test/project/:projectId/lesson/:lessonId/results"*/}
-                    {/*    element={*/}
-                    {/*        <Layout>*/}
-                    {/*            <ProtectedRoute element={<GameResults />} />*/}
-                    {/*        </Layout>*/}
-                    {/*    }*/}
-                    {/*/>*/}
-
-                    {/*/!* Fallback route *!/*/}
-                    {/*<Route path="*" element={<Navigate to="/" replace />} />*/}
-                </Routes>
-            </Router>
-        </AuthProvider>
+        <Router>
+            <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/create-project" element={<CreateProject />} />
+                <Route path="/preview" element={<Preview />} />
+                <Route path="/project/:id" element={<FallingHeartsWebsite />} />
+                <Route
+                    path="/admin"
+                    element={
+                        <ProtectedRoute>
+                            <Admin />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+        </Router>
     );
 };
 

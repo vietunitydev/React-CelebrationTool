@@ -1,43 +1,26 @@
 import React, { useState, useEffect, useRef } from 'react';
+import {FallingItem, ProjectData} from "@/types/types.ts";
 
-interface FallingItem {
-    id: number;
-    type: 'heart' | 'text' | 'image';
-    content: string;
-    x: number;
-    y: number;
-    speed: number;
-    rotation: number;
-    rotationSpeed: number;
-    size: number;
-    // Thêm properties cho smooth animation
-    lastFrameTime: number;
-    targetY: number;
-}
+const MAX_ITEMS = 50; // Limit the number of falling items for performance
 
-const FallingHeartsWebsite: React.FC = () => {
+const FallingHeartsWebsite: React.FC<{ projectData?: ProjectData }> = ({ projectData }) => {
     const [fallingItems, setFallingItems] = useState<FallingItem[]>([]);
     const [audioPlaying, setAudioPlaying] = useState(false);
+    const [audioError, setAudioError] = useState<string | null>(null);
     const animationFrameRef = useRef<number>();
     const lastTimeRef = useRef<number>(0);
     const itemsRef = useRef<FallingItem[]>([]);
 
-    // Các câu tình cảm như trong ảnh
-    const loveMessages = [
+    const loveMessages = projectData?.texts || [
         "You make my heart smile",
         "Love ya! 💖",
         "Thank you for being my sunshine",
         "Yêu em nhìuuuu ! 💖",
         "Chúc em 1/6 luôn vui tươi",
         "I love you 💖",
-        "You make my heart smile",
-        "Love ya! 💖",
-        "I love you so much! 💖",
-        "My love for you",
     ];
 
-    // Ảnh giống như trong ảnh gốc (dùng placeholder tương tự)
-    const images = [
+    const images = projectData?.imageUrls || [
         "1.JPG",
         "2.JPG",
         "3.JPG",
@@ -48,26 +31,18 @@ const FallingHeartsWebsite: React.FC = () => {
     const handleStartAudio = () => {
         const audio = document.getElementById('backgroundAudio') as HTMLAudioElement;
         if (audio) {
-            audio.play().then(() => {
-                setAudioPlaying(true);
-            }).catch(err => {
-                console.log('Audio play failed:', err);
-            });
+            audio.play()
+                .then(() => setAudioPlaying(true))
+                .catch(err => {
+                    setAudioError('Failed to play audio. Please try again.');
+                    console.error('Audio play failed:', err);
+                });
         }
     };
 
     const createFallingItem = (): FallingItem => {
-        // Tỷ lệ: chữ rất nhiều, ít tim và ảnh
         const rand = Math.random();
-        let type: 'heart' | 'text' | 'image';
-
-        if (rand < 0.73) {
-            type = 'text';
-        } else if (rand < 0.86) {
-            type = 'heart';
-        } else {
-            type = 'image';
-        }
+        let type: 'heart' | 'text' | 'image' = rand < 0.73 ? 'text' : rand < 0.86 ? 'heart' : 'image';
 
         let content = '';
         if (type === 'heart') {
@@ -87,36 +62,31 @@ const FallingHeartsWebsite: React.FC = () => {
             x: Math.random() * (window.innerWidth - 200),
             y: -150,
             targetY: -150,
-            speed: 2 + Math.random() * 3, // Tốc độ nhanh hơn: 2-5px/frame
+            speed: 2 + Math.random() * 3,
             rotation: 0,
-            rotationSpeed: type === 'heart' ? (Math.random() - 0.5) * 4 : 0, // Chỉ tim mới xoay
-            size: type === 'image' ? 0.9 + Math.random() * 0.8 : 1, // Ảnh có size từ 1.2 đến 2.0 (to hơn)
-            lastFrameTime: currentTime
+            rotationSpeed: type === 'heart' ? (Math.random() - 0.5) * 4 : 0,
+            size: type === 'image' ? 0.9 + Math.random() * 0.8 : 1,
+            lastFrameTime: currentTime,
         };
     };
 
-    // Smooth animation với requestAnimationFrame
     const animate = (currentTime: number) => {
         const deltaTime = currentTime - lastTimeRef.current;
-        const normalizedDelta = deltaTime / 16.67; // Normalize to 60fps
+        const normalizedDelta = deltaTime / 16.67;
 
         itemsRef.current = itemsRef.current
             .map(item => {
-                // Smooth interpolation
                 const timeDiff = currentTime - item.lastFrameTime;
-                const smoothFactor = Math.min(timeDiff / 16.67, 1); // Limit to prevent big jumps
+                const smoothFactor = Math.min(timeDiff / 16.67, 1);
 
-                // Update target position
                 item.targetY += item.speed * normalizedDelta;
-
-                // Smooth interpolation towards target
                 const newY = item.y + (item.targetY - item.y) * smoothFactor * 0.8;
 
                 return {
                     ...item,
                     y: newY,
                     rotation: item.rotation + (item.rotationSpeed * normalizedDelta),
-                    lastFrameTime: currentTime
+                    lastFrameTime: currentTime,
                 };
             })
             .filter(item => item.y < window.innerHeight + 200);
@@ -127,13 +97,13 @@ const FallingHeartsWebsite: React.FC = () => {
     };
 
     useEffect(() => {
-        // Tạo items rơi
         const createItemInterval = setInterval(() => {
-            const newItem = createFallingItem();
-            itemsRef.current = [...itemsRef.current, newItem];
+            if (itemsRef.current.length < MAX_ITEMS) {
+                const newItem = createFallingItem();
+                itemsRef.current = [...itemsRef.current, newItem];
+            }
         }, 250);
 
-        // Bắt đầu animation loop với requestAnimationFrame
         animationFrameRef.current = requestAnimationFrame(animate);
 
         return () => {
@@ -146,25 +116,24 @@ const FallingHeartsWebsite: React.FC = () => {
 
     return (
         <div className="min-h-screen bg-black overflow-hidden relative">
-            {/* Background audio */}
             <audio id="backgroundAudio" loop className="hidden">
-                <source src="/eyes.mp3" type="audio/mpeg" />
-                {/*<source src="/audio/love-song.wav" type="audio/wav" />*/}
+                <source src={projectData?.musicUrl || "/eyes.mp3"} type="audio/mpeg" />
             </audio>
-
-            {/* Audio control button */}
             {!audioPlaying && (
                 <div className="fixed top-4 right-4 z-50">
                     <button
                         onClick={handleStartAudio}
                         className="bg-pink-500/80 hover:bg-pink-500 text-white px-4 py-2 rounded-full shadow-lg backdrop-blur-sm border border-pink-300/50 transition-all duration-300 flex items-center gap-2"
                     >
-                        🎵 Bật nhạc
+                        🎵 Play Music
                     </button>
                 </div>
             )}
-
-            {/* Falling items với smooth transitions */}
+            {audioError && (
+                <div className="fixed top-4 left-4 z-50 text-red-500 bg-white/80 p-2 rounded-lg">
+                    {audioError}
+                </div>
+            )}
             <div className="absolute inset-0 pointer-events-none">
                 {fallingItems.map(item => (
                     <div
@@ -173,8 +142,8 @@ const FallingHeartsWebsite: React.FC = () => {
                         style={{
                             left: `${item.x}px`,
                             transform: `translateY(${item.y}px) ${item.type === 'heart' ? `rotate(${item.rotation}deg)` : ''}`,
-                            transition: 'transform 0.016s linear', // Smooth micro-transitions
-                            willChange: 'transform' // Optimize for animations
+                            transition: 'transform 0.016s linear',
+                            willChange: 'transform',
                         }}
                     >
                         {item.type === 'heart' && (
@@ -182,7 +151,7 @@ const FallingHeartsWebsite: React.FC = () => {
                                 className="text-2xl md:text-3xl inline-block"
                                 style={{
                                     color: 'rgba(255, 105, 180, 0.8)',
-                                    filter: 'drop-shadow(0 0 8px rgba(255, 105, 180, 0.6))'
+                                    filter: 'drop-shadow(0 0 8px rgba(255, 105, 180, 0.6))',
                                 }}
                             >
                                 {item.content}
@@ -195,7 +164,7 @@ const FallingHeartsWebsite: React.FC = () => {
                                     color: 'rgba(255, 105, 180, 0.9)',
                                     textShadow: '0 0 20px rgba(255, 105, 180, 0.8), 0 0 30px rgba(255, 105, 180, 0.6), 0 0 40px rgba(255, 105, 180, 0.4)',
                                     fontFamily: 'Arial, sans-serif',
-                                    filter: 'drop-shadow(0 0 10px rgba(255, 105, 180, 0.7))'
+                                    filter: 'drop-shadow(0 0 10px rgba(255, 105, 180, 0.7))',
                                 }}
                             >
                                 {item.content}
@@ -207,7 +176,7 @@ const FallingHeartsWebsite: React.FC = () => {
                                 style={{
                                     width: `${100 * item.size}px`,
                                     height: `${120 * item.size}px`,
-                                    boxShadow: '0 8px 32px rgba(255, 105, 180, 0.3)'
+                                    boxShadow: '0 8px 32px rgba(255, 105, 180, 0.3)',
                                 }}
                             >
                                 <img
@@ -215,7 +184,12 @@ const FallingHeartsWebsite: React.FC = () => {
                                     alt="Love"
                                     className="w-full h-full object-cover"
                                     style={{
-                                        filter: 'brightness(1.1) contrast(1.1) saturate(1.2)'
+                                        filter: 'brightness(1.1) contrast(1.1) saturate(1.2)',
+                                    }}
+                                    onError={() => {
+                                        // Remove broken image from falling items
+                                        itemsRef.current = itemsRef.current.filter(i => i.id !== item.id);
+                                        setFallingItems([...itemsRef.current]);
                                     }}
                                 />
                             </div>
@@ -223,8 +197,6 @@ const FallingHeartsWebsite: React.FC = () => {
                     </div>
                 ))}
             </div>
-
-            {/* Scattered hearts decoration giống như trong ảnh */}
             <div className="absolute top-10 left-16">
                 <span style={{ color: 'rgba(255, 105, 180, 0.6)' }} className="text-lg">💖</span>
             </div>
@@ -243,13 +215,9 @@ const FallingHeartsWebsite: React.FC = () => {
             <div className="absolute top-80 right-1/3">
                 <span style={{ color: 'rgba(255, 105, 180, 0.5)' }} className="text-sm">💕</span>
             </div>
-
-            {/* Date stamp như trong ảnh gốc */}
             <div className="absolute bottom-4 left-4 text-xs" style={{ color: 'rgba(255, 105, 180, 0.4)' }}>
                 02/02/2025
             </div>
-
-            {/* Các đốm sáng nhỏ giống như trong ảnh */}
             <div className="absolute inset-0">
                 {[...Array(20)].map((_, i) => (
                     <div
@@ -259,7 +227,7 @@ const FallingHeartsWebsite: React.FC = () => {
                             backgroundColor: 'rgba(255, 105, 180, 0.3)',
                             left: `${Math.random() * 100}%`,
                             top: `${Math.random() * 100}%`,
-                            animationDelay: `${Math.random() * 2}s`
+                            animationDelay: `${Math.random() * 2}s`,
                         }}
                     />
                 ))}
