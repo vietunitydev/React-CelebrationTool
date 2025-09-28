@@ -16,12 +16,11 @@ const App: React.FC = () => {
             <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/create-project" element={<CreateProject />} />
+                <Route path="/template" element= {<Template />} />
+                <Route path="/buykey" element= {<BuyKey />} />
                 <Route path="/preview" element={<Preview />} />
                 <Route path="/project/:id" element={<FallingHeartsWebsite />} />
                 <Route path="/admin" element= {<Admin />} />
-                <Route path="/template" element= {<Template />} />
-                <Route path="/admin" element= {<Admin />} />
-                <Route path="/buykey" element= {<BuyKey />} />
                 <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
         </Router>
