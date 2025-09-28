@@ -27,12 +27,12 @@ class ProjectService {
      * @param {Object} projectData - Project data
      * @param {string} projectData.title - Project title
      * @param {string} projectData.theme - Project theme
-     * @param {string} projectData.musicUrl - Music URL (optional)
      * @param {Array<string>} projectData.texts - Array of text messages
      * @param {Array<File>} images - Array of image files
+     * @param {File|null} musicFile - Music file (optional)
      * @returns {Promise} - Created project data
      */
-    async createProject(apiKey, projectData, images) {
+    async createProject(apiKey, projectData, images, musicFile = null) {
         try {
             const formData = new FormData();
 
@@ -40,18 +40,19 @@ class ProjectService {
             formData.append('title', projectData.title);
             formData.append('theme', projectData.theme);
 
-            if (projectData.musicUrl) {
-                formData.append('musicUrl', projectData.musicUrl);
-            }
-
             // Add texts as JSON string
             formData.append('texts', JSON.stringify(projectData.texts));
 
             // Add images
             if (images && images.length > 0) {
-                images.forEach((image, index) => {
+                images.forEach((image) => {
                     formData.append('images', image);
                 });
+            }
+
+            // Add music file if provided
+            if (musicFile) {
+                formData.append('music', musicFile);
             }
 
             const headers = createAuthHeaders(apiKey);
