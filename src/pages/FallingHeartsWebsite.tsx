@@ -74,11 +74,11 @@ const FallingHeartsWebsite: React.FC = () => {
                         texts: response.project.texts || [],
                         imageUrls: response.project.imageUrls || [],
                         musicUrl: response.project.musicUrl || null,
-                        createdAt: response.project.createdAt,
-                        updatedAt: response.project.updatedAt,
-                        viewCount: response.project.viewCount,
-                        isPublic: response.project.isPublic,
-                        isFeatured: response.project.isFeatured
+                        // createdAt: response.project.createdAt,
+                        // updatedAt: response.project.updatedAt,
+                        // viewCount: response.project.viewCount,
+                        // isPublic: response.project.isPublic,
+                        // isFeatured: response.project.isFeatured
                     };
 
                     setProjectData(transformedProject);
@@ -267,11 +267,11 @@ const FallingHeartsWebsite: React.FC = () => {
                         Theme: {projectData.theme}
                     </p>
                 )}
-                {projectData?.viewCount !== undefined && (
-                    <p className="text-pink-300/40 text-xs mt-1">
-                        Views: {projectData.viewCount}
-                    </p>
-                )}
+                {/*{projectData?.viewCount !== undefined && (*/}
+                {/*    <p className="text-pink-300/40 text-xs mt-1">*/}
+                {/*        Views: {projectData.viewCount}*/}
+                {/*    </p>*/}
+                {/*)}*/}
             </div>
 
             {/* Remaining uses indicator */}
@@ -354,7 +354,7 @@ const FallingHeartsWebsite: React.FC = () => {
                                     style={{
                                         filter: 'brightness(1.1) contrast(1.1) saturate(1.2)',
                                     }}
-                                    onError={(e) => {
+                                    onError={() => {
                                         console.log('Image failed to load:', item.content);
                                         // Remove failed image from animation
                                         itemsRef.current = itemsRef.current.filter(i => i.id !== item.id);
@@ -391,16 +391,16 @@ const FallingHeartsWebsite: React.FC = () => {
             </div>
 
             {/* Footer info */}
-            <div className="absolute bottom-4 left-4 text-xs space-y-1">
-                <div style={{ color: 'rgba(255, 105, 180, 0.4)' }}>
-                    {projectData?.createdAt ? new Date(projectData.createdAt).toLocaleDateString() : '02/02/2025'}
-                </div>
-                {projectData?.id && (
-                    <div style={{ color: 'rgba(255, 105, 180, 0.3)' }} className="font-mono">
-                        ID: {projectData.id.slice(-8)}
-                    </div>
-                )}
-            </div>
+            {/*<div className="absolute bottom-4 left-4 text-xs space-y-1">*/}
+            {/*    <div style={{ color: 'rgba(255, 105, 180, 0.4)' }}>*/}
+            {/*        {projectData?.createdAt ? new Date(projectData.createdAt).toLocaleDateString() : '02/02/2025'}*/}
+            {/*    </div>*/}
+            {/*    {projectData?.id && (*/}
+            {/*        <div style={{ color: 'rgba(255, 105, 180, 0.3)' }} className="font-mono">*/}
+            {/*            ID: {projectData.id.slice(-8)}*/}
+            {/*        </div>*/}
+            {/*    )}*/}
+            {/*</div>*/}
 
             {/* Sparkles background effect */}
             <div className="absolute inset-0">
@@ -419,15 +419,15 @@ const FallingHeartsWebsite: React.FC = () => {
             </div>
 
             {/* Success message for admin features */}
-            {projectData?.isFeatured && (
-                <div className="absolute top-20 right-4 z-40">
-                    <div className="bg-yellow-500/20 backdrop-blur-sm border border-yellow-300/30 rounded-lg px-3 py-1">
-                        <p className="text-yellow-300 text-xs flex items-center gap-1">
-                            ⭐ Featured
-                        </p>
-                    </div>
-                </div>
-            )}
+            {/*{projectData?.isFeatured && (*/}
+            {/*    <div className="absolute top-20 right-4 z-40">*/}
+            {/*        <div className="bg-yellow-500/20 backdrop-blur-sm border border-yellow-300/30 rounded-lg px-3 py-1">*/}
+            {/*            <p className="text-yellow-300 text-xs flex items-center gap-1">*/}
+            {/*                ⭐ Featured*/}
+            {/*            </p>*/}
+            {/*        </div>*/}
+            {/*    </div>*/}
+            {/*)}*/}
         </div>
     );
 };
