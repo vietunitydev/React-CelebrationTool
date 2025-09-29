@@ -1,6 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { getDocs, collection, deleteDoc, doc } from 'firebase/firestore';
-import { db, adminKey } from '../firebase';
 import { ProjectData } from "@/types/types.ts";
 
 interface Project extends ProjectData {
@@ -16,12 +14,8 @@ const Admin: React.FC = () => {
     const fetchProjects = async () => {
         setLoading(true);
         try {
-            const querySnapshot = await getDocs(collection(db, 'projects'));
-            const projectList: Project[] = querySnapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data(),
-            } as Project));
-            setProjects(projectList);
+
+            // setProjects(projectList);
         } catch (error) {
             console.error('Error fetching projects:', error);
             alert('Failed to load projects.');
@@ -36,15 +30,12 @@ const Admin: React.FC = () => {
             return;
         }
 
-        if (inputAdminKey !== adminKey) {
-            alert('Invalid admin key. Deletion not allowed.');
-            return;
-        }
+
 
         if (window.confirm('Are you sure you want to delete this project?')) {
             try {
-                await deleteDoc(doc(db, 'projects', id));
-                setProjects(projects.filter(project => project.id !== id));
+                // await
+
                 alert('Project deleted successfully.');
             } catch (error) {
                 console.error('Error deleting project:', error);
