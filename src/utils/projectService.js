@@ -6,6 +6,22 @@ import { get, post, del, createAuthHeaders } from '../utils/api.js';
  */
 class ProjectService {
     /**
+     * Get project by id
+     * @param {string} apiKey - User API key
+     * @returns {Promise} - Projects data with remaining uses info
+     */
+    async getProject(id) {
+        try {
+            // const headers = createAuthHeaders(apiKey);
+            const response = await get('/projects/'+id);
+            console.log(response);
+            return response;
+        } catch (error) {
+            console.error('Error fetching projects:', error);
+            throw new Error(`Failed to fetch projects: ${error.message}`);
+        }
+    }
+    /**
      * Get all projects
      * @param {string} apiKey - User API key
      * @returns {Promise} - Projects data with remaining uses info
