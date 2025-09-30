@@ -1,73 +1,55 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
 
 const Home: React.FC = () => {
-    const { user } = useAuth();
-
     return (
-        <div className="text-center">
-            <h1 className="text-3xl font-bold text-gray-900 mb-6">Chào mừng đến với V-Learn</h1>
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 flex flex-col relative overflow-hidden">
+            {/* Animated background elements */}
+            <div className="absolute top-20 left-10 w-72 h-72 bg-blue-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-pulse"></div>
+            <div className="absolute top-40 right-10 w-72 h-72 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-pulse" style={{animationDelay: '2s'}}></div>
+            <div className="absolute -bottom-8 left-1/2 w-72 h-72 bg-pink-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-pulse" style={{animationDelay: '4s'}}></div>
 
-            <div className="bg-white shadow overflow-hidden rounded-lg max-w-4xl mx-auto">
-                <div className="px-4 py-5 sm:p-6">
-                    <div className="text-center">
-                        <p className="mt-1 max-w-2xl text-lg text-gray-700 mx-auto mb-6">
-                            V-Learn là một nền tảng học ngôn ngữ đơn giản và hiệu quả.
-                        </p>
-
-                        {user ? (
-                            <div className="mt-6">
-                                <Link
-                                    to="/vocab-test"
-                                    className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-orange-500 hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500"
-                                >
-                                    Bắt đầu kiểm tra từ vựng
-                                </Link>
-                            </div>
-                        ) : (
-                            <div className="mt-6">
-                                <Link
-                                    to="/login"
-                                    className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-orange-500 hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500"
-                                >
-                                    Đăng nhập để bắt đầu
-                                </Link>
-                            </div>
-                        )}
+            {/* Content wrapper with higher z-index */}
+            <div className="relative z-10 flex flex-col flex-grow">
+                <nav className="bg-white/80 backdrop-blur-md shadow-md p-4 flex justify-between items-center">
+                    <div className="flex items-center space-x-3">
+                        {/*<img*/}
+                        {/*    src="https://via.placeholder.com/150x50?text=Logo"*/}
+                        {/*    alt="Logo"*/}
+                        {/*    className="h-10"*/}
+                        {/*/>*/}
+                        <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                            AnimateStudio
+                        </span>
                     </div>
-                </div>
-            </div>
-
-            <div className="mt-10">
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">Tính năng chính</h2>
-                <div className="max-w-4xl mx-auto grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                    <div className="bg-white overflow-hidden shadow rounded-lg">
-                        <div className="px-4 py-5 sm:p-6">
-                            <h3 className="text-lg font-medium text-gray-900">Kiểm tra từ vựng</h3>
-                            <p className="mt-2 text-sm text-gray-500">
-                                Nhập từ tương ứng với nghĩa được hiển thị để kiểm tra kiến thức của bạn.
-                            </p>
-                        </div>
+                    <div className="flex space-x-4">
+                        <Link to="/create-project">
+                            <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors">
+                                Tạo website của bạn
+                            </button>
+                        </Link>
+                        <Link to="/template">
+                            <button className="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-lg transition-colors">
+                                Xem mẫu
+                            </button>
+                        </Link>
+                        <Link to="/buykey">
+                            <button className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg transition-colors">
+                                Mua Key
+                            </button>
+                        </Link>
                     </div>
+                </nav>
 
-                    <div className="bg-white overflow-hidden shadow rounded-lg">
-                        <div className="px-4 py-5 sm:p-6">
-                            <h3 className="text-lg font-medium text-gray-900">Quản lý bài học</h3>
-                            <p className="mt-2 text-sm text-gray-500">
-                                Tạo và quản lý các môn học, bài học, và danh sách từ vựng của riêng bạn.
-                            </p>
-                        </div>
-                    </div>
-
-                    <div className="bg-white overflow-hidden shadow rounded-lg">
-                        <div className="px-4 py-5 sm:p-6">
-                            <h3 className="text-lg font-medium text-gray-900">Thống kê học tập</h3>
-                            <p className="mt-2 text-sm text-gray-500">
-                                Theo dõi tiến trình học tập của bạn với các thống kê chi tiết sau mỗi bài kiểm tra.
-                            </p>
-                        </div>
-                    </div>
+                <div className="flex flex-col items-center justify-center flex-grow px-4">
+                    <h1 className="text-5xl md:text-6xl font-bold text-center mb-4">
+                        <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+                            Chào mừng đến với Website của AnimateStudio
+                        </span>
+                    </h1>
+                    <p className="text-xl text-gray-600 text-center max-w-2xl">
+                        Tạo nên những website animation tuyệt đẹp một cách dễ dàng. Hãy bắt đầu ngay hôm nay!
+                    </p>
                 </div>
             </div>
         </div>
