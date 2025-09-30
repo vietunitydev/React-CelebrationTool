@@ -1,9 +1,73 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import projectService from '../utils/projectService';
 import { FallingItem, ProjectData } from "@/types/types.ts";
 
 const MAX_ITEMS = 50;
+const POOL_SIZE = 100;
+const CREATE_INTERVAL = 250;
+const PRELOAD_IMAGES = true;
+
+// Object pool for recycling falling items
+class ItemPool {
+    private pool: FallingItem[] = [];
+    private activeItems: Set<number> = new Set();
+
+    constructor(size: number) {
+        for (let i = 0; i < size; i++) {
+            this.pool.push(this.createNewItem());
+        }
+    }
+
+    private createNewItem(): FallingItem {
+        return {
+            id: Math.random(),
+            type: 'heart',
+            content: '',
+            x: 0,
+            y: -150,
+            targetY: -150,
+            speed: 0,
+            rotation: 0,
+            rotationSpeed: 0,
+            size: 1,
+            lastFrameTime: 0,
+        };
+    }
+
+    acquire(type: 'heart' | 'text' | 'image', content: string, currentTime: number): FallingItem {
+        let item = this.pool.pop();
+        if (!item) {
+            item = this.createNewItem();
+        }
+
+        item.id = Date.now() + Math.random();
+        item.type = type;
+        item.content = content;
+        item.x = Math.random() * (window.innerWidth - 200);
+        item.y = -150;
+        item.targetY = -150;
+        item.speed = 2 + Math.random() * 3;
+        item.rotation = 0;
+        item.rotationSpeed = type === 'heart' ? (Math.random() - 0.5) * 4 : 0;
+        item.size = type === 'image' ? 0.9 + Math.random() * 0.8 : 1;
+        item.lastFrameTime = currentTime;
+
+        this.activeItems.add(item.id);
+        return item;
+    }
+
+    release(item: FallingItem): void {
+        this.activeItems.delete(item.id);
+        if (this.pool.length < POOL_SIZE) {
+            this.pool.push(item);
+        }
+    }
+
+    releaseAll(items: FallingItem[]): void {
+        items.forEach(item => this.release(item));
+    }
+}
 
 const FallingHeartsWebsite: React.FC = () => {
     const [fallingItems, setFallingItems] = useState<FallingItem[]>([]);
@@ -13,30 +77,75 @@ const FallingHeartsWebsite: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [remainingUses, setRemainingUses] = useState<number | null>(null);
+    const [imagesLoaded, setImagesLoaded] = useState(false);
+
     const animationFrameRef = useRef<number>();
     const lastTimeRef = useRef<number>(0);
     const itemsRef = useRef<FallingItem[]>([]);
+    const poolRef = useRef<ItemPool>(new ItemPool(POOL_SIZE));
+    const imageCache = useRef<Map<string, HTMLImageElement>>(new Map());
     const { id } = useParams<{ id: string }>();
 
-    // Default data in case fetching fails or for initial setup
-    const loveMessages = projectData?.texts || [
-        "You make my heart smile",
-        "Love ya! 💖",
-        "Thank you for being my sunshine",
-        "Yêu em nhìuuuu ! 💖",
-        "Chúc em luôn vui tươi",
-        "I love you 💖",
-    ];
+    const loveMessages = useMemo(() =>
+            projectData?.texts || [
+                "You make my heart smile",
+                "Love ya! 💖",
+                "Thank you for being my sunshine",
+                "Yêu em nhìuuuu ! 💖",
+                "Chúc em luôn vui tươi",
+                "I love you 💖",
+            ], [projectData?.texts]
+    );
 
-    const images = projectData?.imageUrls || [
-        "1.jpeg",
-        "2.jpeg",
-        "3.jpeg",
-        "4.jpeg",
-        "5.jpeg",
-    ];
+    const images = useMemo(() =>
+            projectData?.imageUrls || [
+                "1.jpeg",
+                "2.jpeg",
+                "3.jpeg",
+                "4.jpeg",
+                "5.jpeg",
+            ], [projectData?.imageUrls]
+    );
 
-    // Fetch project data from API using the direct endpoint
+    // Preload images for better performance
+    useEffect(() => {
+        if (!PRELOAD_IMAGES || images.length === 0) {
+            setImagesLoaded(true);
+            return;
+        }
+
+        let loadedCount = 0;
+        const totalImages = images.length;
+
+        images.forEach((src) => {
+            if (imageCache.current.has(src)) {
+                loadedCount++;
+                if (loadedCount === totalImages) {
+                    setImagesLoaded(true);
+                }
+                return;
+            }
+
+            const img = new Image();
+            img.onload = () => {
+                imageCache.current.set(src, img);
+                loadedCount++;
+                if (loadedCount === totalImages) {
+                    setImagesLoaded(true);
+                }
+            };
+            img.onerror = () => {
+                console.warn(`Failed to preload image: ${src}`);
+                loadedCount++;
+                if (loadedCount === totalImages) {
+                    setImagesLoaded(true);
+                }
+            };
+            img.src = src;
+        });
+    }, [images]);
+
+    // Fetch project data
     useEffect(() => {
         const fetchProjectData = async () => {
             if (!id) {
@@ -46,27 +155,9 @@ const FallingHeartsWebsite: React.FC = () => {
             }
 
             try {
-                // Get API key from localStorage or environment
-                // const apiKey = localStorage.getItem('apiKey') || import.meta.env.REACT_APP_API_KEY;
-
-                // if (!apiKey) {
-                //     setError('API key not found. Please provide an API key.');
-                //     setLoading(false);
-                //     return;
-                // }
-
-                // Validate project ID format
-                // if (!projectService.validateProjectId(id)) {
-                //     setError('Invalid project ID format.');
-                //     setLoading(false);
-                //     return;
-                // }
-
-                // Fetch the specific project directly
                 const response = await projectService.getProject(id);
 
                 if (response.project) {
-                    // Transform the data to match your ProjectData interface
                     const transformedProject: ProjectData = {
                         id: response.project._id || response.project.id,
                         title: response.project.title,
@@ -74,16 +165,10 @@ const FallingHeartsWebsite: React.FC = () => {
                         texts: response.project.texts || [],
                         imageUrls: response.project.imageUrls || [],
                         musicUrl: response.project.musicUrl || null,
-                        // createdAt: response.project.createdAt,
-                        // updatedAt: response.project.updatedAt,
-                        // viewCount: response.project.viewCount,
-                        // isPublic: response.project.isPublic,
-                        // isFeatured: response.project.isFeatured
                     };
 
                     setProjectData(transformedProject);
 
-                    // Set remaining uses if available
                     if (response.remainingUses !== undefined) {
                         setRemainingUses(response.remainingUses);
                     }
@@ -92,8 +177,6 @@ const FallingHeartsWebsite: React.FC = () => {
                 }
             } catch (err: any) {
                 console.error('Error fetching project:', err);
-
-                // Handle different error types with user-friendly messages
                 let errorMessage = 'Failed to load project data.';
 
                 if (err.message.includes('Project not found')) {
@@ -123,7 +206,7 @@ const FallingHeartsWebsite: React.FC = () => {
         fetchProjectData();
     }, [id]);
 
-    const handleStartAudio = () => {
+    const handleStartAudio = useCallback(() => {
         const audio = document.getElementById('backgroundAudio') as HTMLAudioElement;
         if (audio) {
             audio.play()
@@ -133,9 +216,9 @@ const FallingHeartsWebsite: React.FC = () => {
                     console.error('Audio play failed:', err);
                 });
         }
-    };
+    }, []);
 
-    const createFallingItem = (): FallingItem => {
+    const createFallingItem = useCallback((): FallingItem => {
         const rand = Math.random();
         let type: 'heart' | 'text' | 'image' = rand < 0.73 ? 'text' : rand < 0.86 ? 'heart' : 'image';
 
@@ -150,24 +233,14 @@ const FallingHeartsWebsite: React.FC = () => {
         }
 
         const currentTime = performance.now();
-        return {
-            id: Date.now() + Math.random(),
-            type,
-            content,
-            x: Math.random() * (window.innerWidth - 200),
-            y: -150,
-            targetY: -150,
-            speed: 2 + Math.random() * 3,
-            rotation: 0,
-            rotationSpeed: type === 'heart' ? (Math.random() - 0.5) * 4 : 0,
-            size: type === 'image' ? 0.9 + Math.random() * 0.8 : 1,
-            lastFrameTime: currentTime,
-        };
-    };
+        return poolRef.current.acquire(type, content, currentTime);
+    }, [loveMessages, images]);
 
-    const animate = (currentTime: number) => {
+    const animate = useCallback((currentTime: number) => {
         const deltaTime = currentTime - lastTimeRef.current;
         const normalizedDelta = deltaTime / 16.67;
+
+        const itemsToRelease: FallingItem[] = [];
 
         itemsRef.current = itemsRef.current
             .map(item => {
@@ -177,6 +250,11 @@ const FallingHeartsWebsite: React.FC = () => {
                 item.targetY += item.speed * normalizedDelta;
                 const newY = item.y + (item.targetY - item.y) * smoothFactor * 0.8;
 
+                if (newY >= window.innerHeight + 200) {
+                    itemsToRelease.push(item);
+                    return null;
+                }
+
                 return {
                     ...item,
                     y: newY,
@@ -184,22 +262,25 @@ const FallingHeartsWebsite: React.FC = () => {
                     lastFrameTime: currentTime,
                 };
             })
-            .filter(item => item.y < window.innerHeight + 200);
+            .filter((item): item is FallingItem => item !== null);
+
+        // Release items back to pool
+        itemsToRelease.forEach(item => poolRef.current.release(item));
 
         setFallingItems([...itemsRef.current]);
         lastTimeRef.current = currentTime;
         animationFrameRef.current = requestAnimationFrame(animate);
-    };
+    }, []);
 
     useEffect(() => {
-        if (loading || error) return;
+        if (loading || error || !imagesLoaded) return;
 
         const createItemInterval = setInterval(() => {
             if (itemsRef.current.length < MAX_ITEMS) {
                 const newItem = createFallingItem();
                 itemsRef.current = [...itemsRef.current, newItem];
             }
-        }, 250);
+        }, CREATE_INTERVAL);
 
         animationFrameRef.current = requestAnimationFrame(animate);
 
@@ -208,15 +289,20 @@ const FallingHeartsWebsite: React.FC = () => {
             if (animationFrameRef.current) {
                 cancelAnimationFrame(animationFrameRef.current);
             }
+            // Release all items back to pool on cleanup
+            poolRef.current.releaseAll(itemsRef.current);
+            itemsRef.current = [];
         };
-    }, [loading, error, projectData]);
+    }, [loading, error, imagesLoaded, createFallingItem, animate]);
 
-    if (loading) {
+    if (loading || !imagesLoaded) {
         return (
             <div className="min-h-screen bg-black flex items-center justify-center">
                 <div className="text-center">
                     <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-pink-500 mx-auto mb-4"></div>
-                    <p className="text-white text-lg">Loading project...</p>
+                    <p className="text-white text-lg">
+                        {loading ? 'Loading project...' : 'Loading images...'}
+                    </p>
                     <p className="text-pink-400 text-sm mt-2">Project ID: {id}</p>
                 </div>
             </div>
@@ -251,11 +337,10 @@ const FallingHeartsWebsite: React.FC = () => {
 
     return (
         <div className="min-h-screen bg-black overflow-hidden relative">
-            <audio id="backgroundAudio" loop className="hidden">
+            <audio id="backgroundAudio" loop className="hidden" preload="auto">
                 <source src={projectData?.musicUrl || "/eyes.mp3"} type="audio/mpeg" />
             </audio>
 
-            {/* Project info header */}
             <div className="absolute top-4 left-4 z-40 max-w-md">
                 {projectData?.title && (
                     <h1 className="text-pink-400/80 text-lg font-light tracking-wide mb-1">
@@ -267,14 +352,8 @@ const FallingHeartsWebsite: React.FC = () => {
                         Theme: {projectData.theme}
                     </p>
                 )}
-                {/*{projectData?.viewCount !== undefined && (*/}
-                {/*    <p className="text-pink-300/40 text-xs mt-1">*/}
-                {/*        Views: {projectData.viewCount}*/}
-                {/*    </p>*/}
-                {/*)}*/}
             </div>
 
-            {/* Remaining uses indicator */}
             {remainingUses !== null && (
                 <div className="absolute top-4 right-20 z-40">
                     <div className="bg-pink-500/20 backdrop-blur-sm border border-pink-300/30 rounded-lg px-3 py-1">
@@ -310,7 +389,6 @@ const FallingHeartsWebsite: React.FC = () => {
                         style={{
                             left: `${item.x}px`,
                             transform: `translateY(${item.y}px) ${item.type === 'heart' ? `rotate(${item.rotation}deg)` : ''}`,
-                            transition: 'transform 0.016s linear',
                             willChange: 'transform',
                         }}
                     >
@@ -350,18 +428,11 @@ const FallingHeartsWebsite: React.FC = () => {
                                 <img
                                     src={item.content}
                                     alt="Love"
+                                    loading="lazy"
+                                    decoding="async"
                                     className="w-full h-full object-cover"
                                     style={{
                                         filter: 'brightness(1.1) contrast(1.1) saturate(1.2)',
-                                    }}
-                                    onError={() => {
-                                        console.log('Image failed to load:', item.content);
-                                        // Remove failed image from animation
-                                        itemsRef.current = itemsRef.current.filter(i => i.id !== item.id);
-                                        setFallingItems([...itemsRef.current]);
-                                    }}
-                                    onLoad={() => {
-                                        console.log('Image loaded successfully:', item.content);
                                     }}
                                 />
                             </div>
@@ -370,7 +441,6 @@ const FallingHeartsWebsite: React.FC = () => {
                 ))}
             </div>
 
-            {/* Static decorative hearts */}
             <div className="absolute top-10 left-16">
                 <span style={{ color: 'rgba(255, 105, 180, 0.6)' }} className="text-lg">💖</span>
             </div>
@@ -390,19 +460,6 @@ const FallingHeartsWebsite: React.FC = () => {
                 <span style={{ color: 'rgba(255, 105, 180, 0.5)' }} className="text-sm">💕</span>
             </div>
 
-            {/* Footer info */}
-            {/*<div className="absolute bottom-4 left-4 text-xs space-y-1">*/}
-            {/*    <div style={{ color: 'rgba(255, 105, 180, 0.4)' }}>*/}
-            {/*        {projectData?.createdAt ? new Date(projectData.createdAt).toLocaleDateString() : '02/02/2025'}*/}
-            {/*    </div>*/}
-            {/*    {projectData?.id && (*/}
-            {/*        <div style={{ color: 'rgba(255, 105, 180, 0.3)' }} className="font-mono">*/}
-            {/*            ID: {projectData.id.slice(-8)}*/}
-            {/*        </div>*/}
-            {/*    )}*/}
-            {/*</div>*/}
-
-            {/* Sparkles background effect */}
             <div className="absolute inset-0">
                 {[...Array(20)].map((_, i) => (
                     <div
@@ -417,17 +474,6 @@ const FallingHeartsWebsite: React.FC = () => {
                     />
                 ))}
             </div>
-
-            {/* Success message for admin features */}
-            {/*{projectData?.isFeatured && (*/}
-            {/*    <div className="absolute top-20 right-4 z-40">*/}
-            {/*        <div className="bg-yellow-500/20 backdrop-blur-sm border border-yellow-300/30 rounded-lg px-3 py-1">*/}
-            {/*            <p className="text-yellow-300 text-xs flex items-center gap-1">*/}
-            {/*                ⭐ Featured*/}
-            {/*            </p>*/}
-            {/*        </div>*/}
-            {/*    </div>*/}
-            {/*)}*/}
         </div>
     );
 };
