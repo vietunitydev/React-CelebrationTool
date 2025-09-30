@@ -14,9 +14,11 @@ class PaymentService {
         }
     }
 
-    async Callback() {
+    async clientVNPayReturn(queryString) {
         try{
-            const response = await get('/payments/check-key/'+orderId);
+            console.log(queryString);
+
+            const response = await get('/payments/vnpay_return?$'+queryString);
             console.log(response);
             return response;
         }
