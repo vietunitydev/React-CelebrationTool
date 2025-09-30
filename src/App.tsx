@@ -9,8 +9,6 @@ import Template from "@/pages/Template.tsx";
 import BuyKey from "@/pages/BuyKey.tsx";
 import VNPReturnPage from "@/pages/VNPReturnPage.tsx";
 
-
-
 const App: React.FC = () => {
     return (
         <Router>
