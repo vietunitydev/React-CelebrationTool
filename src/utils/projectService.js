@@ -14,7 +14,7 @@ class ProjectService {
         try {
             // const headers = createAuthHeaders(apiKey);
             const response = await get('/projects/'+id);
-            console.log(response);
+            // console.log(response);
             return response;
         } catch (error) {
             console.error('Error fetching projects:', error);

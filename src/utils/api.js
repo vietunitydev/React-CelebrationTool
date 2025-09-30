@@ -75,11 +75,15 @@ const get = (endpoint, headers = {}) => {
 const post = (endpoint, body = null, headers = {}) => {
     const options = {
         method: 'POST',
-        headers,
+        headers: {
+            'Content-Type': 'application/json',
+            ...headers
+        },
     };
 
     if (body) {
         if (body instanceof FormData) {
+            delete options.headers['Content-Type'];
             options.body = body;
         } else {
             options.body = JSON.stringify(body);
